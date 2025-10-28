@@ -1,0 +1,7 @@
+﻿services:
+  firmeza.web:
+    image: firmeza.web
+    build:
+      context: .
+      dockerfile: Firmeza.web/Dockerfile
+
