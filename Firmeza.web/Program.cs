@@ -1,6 +1,7 @@
 
 using DotNetEnv;
 using Firmeza.web.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 // load the environment variables:
@@ -34,6 +35,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
             errorCodesToAdd:null);
     }));
 
+// (*) Configuration identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -52,6 +58,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
