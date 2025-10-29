@@ -2,6 +2,8 @@
 using DotNetEnv;
 using Firmeza.web.Data;
 using Firmeza.web.Data.Seeders;
+using Firmeza.web.Repositories.Implementations;
+using Firmeza.web.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -72,6 +74,9 @@ builder.Services.AddAuthorization(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// register the repositories:
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+
 var app = builder.Build();
 
 // Seed roles and admin user
@@ -106,6 +111,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+
 
 app.MapControllerRoute(
     name: "default",
