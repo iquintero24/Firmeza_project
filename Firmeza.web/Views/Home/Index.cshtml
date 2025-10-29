@@ -1,8 +1,46 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    // Título descriptivo para la aplicación
+    ViewData["Title"] = "Firmeza | Construction Supplies and Machinery Rental";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="p-5 bg-dark  text-white text-center hero-section">
+    <div class="container-fluid py-5">
+        <h1 class="display-4 fw-bold text-warning">
+            <i class="fas fa-sitemap me-3"></i> 
+            Firmeza Administrative System
+        </h1>
+        <p class="col-md-10 fs-5 mx-auto text-light">
+            Centralized platform for the efficient management of **inventory, customers, sales, and industrial vehicle rental.**
+        </p>
+    </div>
+</div>
+
+<div class="row g-4 justify-content-center mt-5">
+    
+    <div class="col-lg-8">
+        <div class="card shadow-lg h-100 bg-light border-warning border-3">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-shield-alt fa-5x text-warning"></i>
+                </div>
+                
+                <h3 class="card-title text-dark mb-3 text-center">
+                    ADMIN PANEL ACCESS
+                </h3>
+                <p class="card-text text-muted text-center">
+                    This module is restricted. Log in to manage all CRUD operations. **Only for Administrators.**
+                </p>
+                <div class="mt-5 text-center">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-warning btn-lg w-50 fw-bold text-dark">
+                        <i class="fas fa-sign-in-alt me-2"></i> START SESSION
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="text-center mt-5 p-3 bg-light rounded">
+    <small class="text-muted">Developed with ASP.NET Core MVC and Identity | Firmeza &copy; @DateTime.Now.Year</small>
 </div>
