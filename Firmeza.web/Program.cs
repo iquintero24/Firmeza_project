@@ -4,6 +4,8 @@ using Firmeza.web.Data;
 using Firmeza.web.Data.Seeders;
 using Firmeza.web.Repositories.Implementations;
 using Firmeza.web.Repositories.Interfaces;
+using Firmeza.web.Services.Implementations;
+using Firmeza.web.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -76,6 +78,8 @@ builder.Services.AddControllersWithViews();
 
 // register the repositories:
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
