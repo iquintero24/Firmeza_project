@@ -30,5 +30,5 @@ public class Product
     public int Stock { get; set; }
 
     // Relationship: A product can be in many sale details (1:N)
-    public required ICollection<SaleDetail> SaleDetails { get; set; }
+    public ICollection<SaleDetail> SaleDetails { get; set; } 
 }
