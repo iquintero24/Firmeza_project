@@ -30,5 +30,5 @@ public class Customer
     public string Phone { get; set; } = string.Empty;
 
     // Relationship: A customer can have many sales (1:N)
-    public required ICollection<Sale> Sales { get; set; }
+    public ICollection<Sale> Sales { get; set; } = new List<Sale>();
 }
