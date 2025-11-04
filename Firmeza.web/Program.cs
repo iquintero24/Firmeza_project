@@ -80,6 +80,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 var app = builder.Build();
 
@@ -118,7 +120,7 @@ app.UseAuthorization();
 
 
 
-app.MapControllerRoute(
+app.MapControllerRoute( 
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
