@@ -1,14 +1,13 @@
+
+
 using Firmeza.web.Models.ViewModels.Customers;
 using Firmeza.web.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Firmeza.web.Controllers;
-
-public class CustomerController
-{
-    // Restringe el acceso solo a usuarios con el rol "Administrador"
-    [Authorize(Roles = "Administrador")] 
+namespace Firmeza.web.Controllers
+{ 
+    [Authorize(Roles = "Administrator")] 
     public class CustomersController : Controller
     {
         private readonly ICustomerService _customerService;
@@ -48,22 +47,19 @@ public class CustomerController
             if (!ModelState.IsValid)
             {
                 ViewData["Title"] = "Register New Customer";
-                // Si la validación de ViewModel falla (ej: password mismatch), regresa
                 return View(model); 
             }
 
             try
             {
-                // Llama al servicio para crear el cliente y el usuario Identity
                 await _customerService.CreateCustomerAsync(model);
                 
                 TempData["SuccessMessage"] = $"Customer '{model.Name}' and associated user account created successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            // Captura las excepciones de lógica de negocio lanzadas por el servicio
             catch (InvalidOperationException ex) 
             {
-                // Muestra el mensaje de error de unicidad o de Identity (ej: contraseña débil)
+                // Muestra el error de unicidad o de Identity
                 ModelState.AddModelError("", ex.Message);
                 ViewData["Title"] = "Register New Customer";
                 return View(model);
@@ -148,4 +144,4 @@ public class CustomerController
             return RedirectToAction(nameof(Index));
         }
     }
-}
+} 
