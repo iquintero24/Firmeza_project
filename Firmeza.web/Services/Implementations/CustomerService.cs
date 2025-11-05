@@ -1,7 +1,6 @@
-using Firmeza.web.Data;
-using Firmeza.web.Data.Entities;
+using Firmeza.Domain.Entities;
+using Firmeza.Domain.Interfaces;
 using Firmeza.web.Models.ViewModels.Customers;
-using Firmeza.web.Repositories.Interfaces;
 using Firmeza.web.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 

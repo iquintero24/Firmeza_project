@@ -1,4 +1,4 @@
-using Firmeza.web.Repositories.Interfaces;
+using Firmeza.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

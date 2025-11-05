@@ -1,4 +1,3 @@
-using Firmeza.web.Data.Entities;
 using Firmeza.web.Models.ViewModels.Products;
 
 namespace Firmeza.web.Services.Interfaces;
