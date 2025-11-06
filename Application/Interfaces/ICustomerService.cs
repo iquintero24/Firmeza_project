@@ -1,6 +1,6 @@
-using Firmeza.web.Models.ViewModels.Customers;
+using Firmeza.Application.DTOs.Customers;
 
-namespace Firmeza.web.Services.Interfaces;
+namespace Firmeza.Application.Interfaces;
 
 public interface ICustomerService
 {

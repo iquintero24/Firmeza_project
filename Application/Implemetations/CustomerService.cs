@@ -1,10 +1,12 @@
+
+using Firmeza.Application.DTOs.Customers;
+using Firmeza.Application.Interfaces;
 using Firmeza.Domain.Entities;
 using Firmeza.Domain.Interfaces;
-using Firmeza.web.Models.ViewModels.Customers;
-using Firmeza.web.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace Firmeza.web.Services.Implementations;
+
+namespace Firmeza.Application.Implemetations;
 
 public class CustomerService: ICustomerService
 {

@@ -1,4 +1,6 @@
 using DotNetEnv;
+using Firmeza.Application.Implemetations;
+using Firmeza.Application.Interfaces;
 using Firmeza.Domain.Entities;
 using Firmeza.Domain.Interfaces;
 using Firmeza.Infrastructure.Persistence;

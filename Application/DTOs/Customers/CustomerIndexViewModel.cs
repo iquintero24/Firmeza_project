@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Firmeza.web.Models.ViewModels.Customers;
+namespace Firmeza.Application.DTOs.Customers;
 
 public class CustomerIndexViewModel
 {
