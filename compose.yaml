@@ -5,3 +5,9 @@
       context: .
       dockerfile: Firmeza.web/Dockerfile
 
+  firmeza.api:
+    image: firmeza.api
+    build:
+      context: .
+      dockerfile: Firmeza.Api/Dockerfile
+

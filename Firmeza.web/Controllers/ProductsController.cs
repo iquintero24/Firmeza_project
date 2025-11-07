@@ -1,5 +1,5 @@
-using Firmeza.web.Models.ViewModels.Products;
-using Firmeza.web.Services.Interfaces;
+using Firmeza.Application.DTOs.Products;
+using Firmeza.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
