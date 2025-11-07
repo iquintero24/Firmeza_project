@@ -1,6 +1,8 @@
-using Firmeza.web.Models.ViewModels.Products;
 
-namespace Firmeza.web.Services.Interfaces;
+
+using Firmeza.Application.DTOs.Products;
+
+namespace Firmeza.Application.Interfaces;
 
 public interface IProductService
 {

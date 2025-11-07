@@ -6,8 +6,6 @@ using Firmeza.Domain.Interfaces;
 using Firmeza.Infrastructure.Persistence;
 using Firmeza.Infrastructure.Persistence.Seeders;
 using Firmeza.Infrastructure.Persistence.Repositories;
-using Firmeza.web.Services.Implementations;
-using Firmeza.web.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

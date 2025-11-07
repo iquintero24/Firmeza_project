@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Firmeza.web.Models.ViewModels.Products;
+namespace Firmeza.Application.DTOs.Products;
 
 public class ProductIndexViewModel
 {

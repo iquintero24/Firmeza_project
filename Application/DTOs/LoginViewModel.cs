@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Firmeza.web.Models.ViewModels;
+namespace Firmeza.Application.DTOs;
 
 public class LoginViewModel
 {

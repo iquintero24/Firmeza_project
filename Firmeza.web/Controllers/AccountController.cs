@@ -1,5 +1,5 @@
+using Firmeza.Application.DTOs;
 using Firmeza.Domain.Entities;
-using Firmeza.web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

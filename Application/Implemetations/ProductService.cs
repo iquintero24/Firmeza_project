@@ -1,9 +1,9 @@
+using Firmeza.Application.DTOs.Products;
+using Firmeza.Application.Interfaces;
 using Firmeza.Domain.Entities;
 using Firmeza.Domain.Interfaces;
-using Firmeza.web.Models.ViewModels.Products;
-using Firmeza.web.Services.Interfaces;
 
-namespace Firmeza.web.Services.Implementations;
+namespace Firmeza.Application.Implemetations;
 
 public class ProductService:IProductService
 {
