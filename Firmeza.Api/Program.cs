@@ -1,27 +1,34 @@
-
+using System.Text;
 using DotNetEnv;
+using Firmeza.Application.Implemetations;
+using Firmeza.Application.Interfaces;
 using Firmeza.Domain.Entities;
+using Firmeza.Domain.Interfaces;
 using Firmeza.Infrastructure.Persistence;
+using Firmeza.Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ============================================
+// 🔹 DATABASE CONFIGURATION
+// ============================================
 var connectionString = builder.Configuration.GetValue<string>("SUPABASE_CONNECTION_STRING");
 
-if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&  args.Contains("database update")) 
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" && args.Contains("database update"))
 {
     connectionString = builder.Configuration.GetValue<string>("SUPABASE_MIGRATION_STRING");
 }
 
 if (string.IsNullOrEmpty(connectionString))
-{
     throw new Exception("Connection string not found: SUPABASE_CONNECTION_STRING");
-}
 
-// register DBcontext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, npgsqlOptions =>
     {
@@ -29,10 +36,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(30),
             errorCodesToAdd: null);
-
     }));
 
-// configure Indetity
+// ============================================
+// 🔹 IDENTITY CONFIGURATION
+// ============================================
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -41,18 +49,89 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 6;
     options.SignIn.RequireConfirmedAccount = false;
-}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// ============================================
+// 🔹 JWT CONFIGURATION
+// ============================================
+var jwtKey = Environment.GetEnvironmentVariable("TOKEN_JWT");
+if (string.IsNullOrEmpty(jwtKey))
+    throw new Exception("TOKEN_JWT not configured in .env");
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// ============================================
+// 🔹 DEPENDENCY INJECTION
+// ============================================
+builder.Services.AddScoped<ITokenService, TokenService>();
+// register application services
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>(); // 👈 Repositorio
+builder.Services.AddScoped<ICustomerService, CustomerService>();       // 👈 Servicio
 
 
+// ============================================
+// 🔹 CONTROLLERS
+// ============================================
+builder.Services.AddControllers(); // 👈 FALTA ESTO para que Swagger detecte los controladores
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// ============================================
+// 🔹 SWAGGER CONFIGURATION
+// ============================================
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Firmeza API", Version = "v1" });
 
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Insert the JWT token preceded by 'Bearer '",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+// ============================================
+// 🔹 BUILD APPLICATION
+// ============================================
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -61,29 +140,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+// 👇 ESTA LÍNEA MAPEARÁ TODOS TUS CONTROLADORES
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
