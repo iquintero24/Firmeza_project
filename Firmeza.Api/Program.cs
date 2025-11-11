@@ -1,4 +1,5 @@
 using System.Text;
+using Application.Mappings;
 using DotNetEnv;
 using Firmeza.Application.Implemetations;
 using Firmeza.Application.Interfaces;
@@ -89,6 +90,11 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>(); // 👈 Repositorio
 builder.Services.AddScoped<ICustomerService, CustomerService>();       // 👈 Servicio
 
+// 👇 AGREGA ESTAS DOS LÍNEAS
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 // ============================================
 // 🔹 CONTROLLERS

@@ -17,6 +17,7 @@ public static class DataSeeder
 
         await EnsureRoleExists(roleManager, "Administrator");
         await EnsureRoleExists(roleManager, "User");
+        await EnsureRoleExists(roleManager, "Customer");
 
         await EnsureAdminUserExists(userManager);
     }
