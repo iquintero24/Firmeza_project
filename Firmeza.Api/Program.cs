@@ -87,12 +87,15 @@ builder.Services.AddAuthorization();
 // ============================================
 builder.Services.AddScoped<ITokenService, TokenService>();
 // register application services
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>(); // 👈 Repositorio
-builder.Services.AddScoped<ICustomerService, CustomerService>();       // 👈 Servicio
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>(); 
+builder.Services.AddScoped<ICustomerService, CustomerService>();       
 
-// 👇 AGREGA ESTAS DOS LÍNEAS
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<ISaleRepository, SaleRepository>();
+builder.Services.AddScoped<ISaleService, SaleService>();
+
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 

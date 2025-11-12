@@ -14,7 +14,7 @@ public class SaleDetail
     public int SaleId { get; set; }
 
     [ForeignKey("SaleId")]
-    public required Sale Sale { get; set; }
+    public Sale? Sale { get; set; }
 
     // Foreign Key to Product (N:1 Relationship)
     [Required]
