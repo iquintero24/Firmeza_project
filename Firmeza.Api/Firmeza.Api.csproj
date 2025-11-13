@@ -39,4 +39,8 @@
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\Receipt\" />
+    </ItemGroup>
+
 </Project>

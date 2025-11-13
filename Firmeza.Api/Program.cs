@@ -141,6 +141,8 @@ builder.Services.AddSwaggerGen(c =>
 // ============================================
 var app = builder.Build();
 
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

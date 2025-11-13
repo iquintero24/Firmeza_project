@@ -2,6 +2,7 @@ using Firmeza.Application.DTOs.Sales;
 using Firmeza.Application.Interfaces;
 using Firmeza.Domain.Entities;
 using Firmeza.Domain.Interfaces;
+using Infrastructure.Utils;
 
 namespace Firmeza.Application.Implemetations;
 
@@ -105,6 +106,9 @@ public class SaleService : ISaleService
         }
 
         var savedSale = await _saleRepository.AddAsync(sale);
+        
+        // generate pdf 
+        var pdfPath = PdfGenerator.GenerateSaleReceipt(savedSale);
 
         return new SaleIndexViewModel
         {
@@ -113,6 +117,8 @@ public class SaleService : ISaleService
             SaleDate = savedSale.SaleDate,
             ReceiptNumber = savedSale.ReceiptNumber,
             Total = savedSale.Total,
+            PdfUrl = pdfPath
+            
         };
     }
 

@@ -7,4 +7,5 @@ public class SaleIndexViewModel
     public string ReceiptNumber { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
     public decimal Total { get; set; }
+    public string? PdfUrl { get; set; }
 }
