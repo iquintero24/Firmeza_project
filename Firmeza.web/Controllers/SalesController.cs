@@ -53,6 +53,35 @@ public class SalesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var sale = await _saleService.GetSaleForEditAsync(id);
+        if (sale == null) return NotFound();
+
+        var model = new SaleEditViewModel
+        {
+            Id = sale.Id,
+            CustomerId = sale.CustomerId,
+            SaleDetails = sale.SaleDetails.Select(d => new SaleDetailEditViewModel
+            {
+                Id = d.Id,
+                ProductId = d.ProductId,
+                Quantity = d.Quantity,
+                AppliedUnitPrice = d.AppliedUnitPrice
+            }).ToList(),
+            Subtotal = sale.Subtotal,
+            Iva = sale.Iva,
+            Total = sale.Total
+        };
+        
+        ViewBag.Customers = await _customerService.GetAllCustomersAsync();
+        ViewBag.Products = await _productService.GetAllProductsAsync();
+        
+        return View(model);
+    }
+
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, SaleEditViewModel model)
@@ -99,7 +128,7 @@ public class SalesController : Controller
         if (string.IsNullOrEmpty(fileName))
             return NotFound();
         
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Receipts", fileName);
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Receipt", fileName);
         if (!System.IO.File.Exists(path))
             return NotFound();
         

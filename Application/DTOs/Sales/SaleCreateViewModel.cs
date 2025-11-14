@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using Firmeza.Application.DTOs.Customers;
+using Firmeza.Application.DTOs.Products;
 
 namespace Firmeza.Application.DTOs.Sales
 {
@@ -17,12 +19,21 @@ namespace Firmeza.Application.DTOs.Sales
 
     public class SaleCreateViewModel
     {
+        // --------- Customer selection ---------
         [Required]
         public int CustomerId { get; set; }
+
+        public List<CustomerIndexViewModel> Customers { get; set; } = new();
+
+
+        // --------- Product selection ---------
+        public List<ProductIndexViewModel> Products { get; set; } = new();
 
         [Required]
         public List<SaleDetailCreateViewModel> SaleDetails { get; set; } = new();
 
+
+        // --------- Calculated fields ---------
         [Required]
         public decimal Subtotal { get; set; }
 
