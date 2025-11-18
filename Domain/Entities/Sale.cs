@@ -11,7 +11,7 @@ public class Sale
 
     // Sale registration date
     [DataType(DataType.DateTime)]
-    public DateTime SaleDate { get; set; } = DateTime.Now;
+    public DateTime SaleDate { get; set; } = DateTime.UtcNow;
 
     // Sale/Receipt number
     [StringLength(20)]

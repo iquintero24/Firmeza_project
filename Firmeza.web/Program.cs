@@ -73,10 +73,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>(); // <--- Registrado
+builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 
 // Register services (from Web)
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISaleService, SaleService>();
 
 // --------------------
 // Build the app
