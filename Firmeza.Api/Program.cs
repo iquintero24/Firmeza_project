@@ -136,6 +136,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ClientPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+    });
+});
+
 // ============================================
 // 🔹 BUILD APPLICATION
 // ============================================
@@ -153,6 +161,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("ClientPolicy");
 
 // 👇 ESTA LÍNEA MAPEARÁ TODOS TUS CONTROLADORES
 app.MapControllers();
