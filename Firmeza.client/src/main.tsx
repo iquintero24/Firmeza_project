@@ -8,6 +8,7 @@ import './index.css';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { CataloguePage } from './pages/CataloguePage.tsx'; // Importación correcta
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'; // Importación correcta
+import { RegisterPage } from './pages/RegisterPage.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
@@ -19,15 +20,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     {/* Rutas Públicas (Accesibles sin Login) */}
                     <Route index element={<LoginPage />} />
                     <Route path="/login" element={<LoginPage />} />
-
-                    {/* Placeholder para el Registro (lo implementaremos después) */}
-                    <Route path="/registro" element={
-                        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-                            <h1 className="text-3xl font-bold p-8 bg-white shadow-lg rounded-lg">
-                                Formulario de Registro (PRONTO)
-                            </h1>
-                        </div>
-                    } />
+                    <Route path="/register" element={<RegisterPage />} />
+                    
 
                     {/* GRUPO DE RUTAS PROTEGIDAS */}
                     <Route element={<ProtectedRoute />}>
