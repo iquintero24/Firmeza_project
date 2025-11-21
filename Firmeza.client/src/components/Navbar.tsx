@@ -25,7 +25,8 @@ const ListItem = ({ title, children, href, ...props }) => {
                 href={href}
                 className="block select-none space-y-1 rounded-md p-3 leading-none no-underline transition-colors hover:bg-gray-100 outline-none"
             >
-                <div className="text-sm font-medium leading-none text-gray-900">
+                {/* Texto del dropdown cambiado a text-black */}
+                <div className="text-sm font-medium leading-none text-black">
                     {title}
                 </div>
                 <p className="line-clamp-2 text-sm leading-snug text-gray-500">
@@ -40,9 +41,10 @@ const ListItem = ({ title, children, href, ...props }) => {
 
 /**
  * Simulación de NavigationMenuLink y Button (estilos base)
+ * MODIFICADO: Usa text-black para máximo contraste.
  */
 const NavigationMenuLink = ({ children, className, ...props }) => (
-    <a {...props} className={`inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:bg-gray-100 hover:bg-gray-100 text-gray-700 ${className}`}>
+    <a {...props} className={`inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:bg-gray-100 hover:bg-gray-100 bg-white text-black ${className}`}>
         {children}
     </a>
 );
@@ -95,7 +97,8 @@ const NavigationMenuTrigger = ({ children, content }) => {
         >
             <button
                 onClick={toggleMenu}
-                className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 focus:bg-gray-100 text-gray-900 focus:outline-none"
+                // *** CLASES CORREGIDAS: Fondo blanco (bg-white) y texto negro absoluto (text-black). ***
+                className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors bg-white text-white hover:bg-gray-100 focus:bg-gray-100 text-black focus:outline-none"
             >
                 {children}
                 <ChevronDown className={`ml-1 h-4 w-4 transition duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -211,7 +214,8 @@ export function Navbar({ onLogout }: NavbarProps) {
 
                 {/* BOTONES DERECHA */}
                 <div className="flex items-center gap-3">
-                    <Button variant="outline">
+                    {/* CAMBIO: Se usa variant="default" para fondo oscuro y texto blanco */}
+                    <Button variant="default">
                         <ShoppingCart className="h-4 w-4 mr-2" /> Carrito
                     </Button>
                     {onLogout && (
@@ -233,6 +237,7 @@ export default function App() {
         // Usamos un modal o componente UI en lugar de alert()
         // Para esta simulación, solo logeamos.
         // En una app real, pondrías un modal.
+        // Usando un simple alert() para la simulación
         alert("Sesión cerrada (Simulación)");
     };
 
