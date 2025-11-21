@@ -17,6 +17,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { AppLayout } from "@/layouts/AppLayout";
 
+// ⭐ Importamos el carrito global
+import { useCart } from "../context/CartContext";
+
 // Interfaces
 interface Product {
     id: number;
@@ -30,58 +33,18 @@ interface Product {
 export function CataloguePage() {
     const navigate = useNavigate();
 
+    const { addItem, getQuantity } = useCart(); // ⭐ carrito global
+
     const [products, setProducts] = useState<Product[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
-
-    const [cartItems, setCartItems] = useState<
-        { productId: number; quantity: number }[]
-    >([]);
 
     // ------------------- Logout --------------------
     const handleLogout = () => {
         localStorage.removeItem("jwt_token");
         navigate("/login", { replace: true });
     };
-
-    // ------------------- Cart logic --------------------
-    const handleAddToCart = (productId: number, change: number) => {
-        setCartItems((prev) => {
-            const existing = prev.find((x) => x.productId === productId);
-            const product = products.find((p) => p.id === productId);
-            if (!product) return prev;
-
-            const max = product.stock;
-
-            if (existing) {
-                const newQty = existing.quantity + change;
-
-                if (newQty <= 0)
-                    return prev.filter((x) => x.productId !== productId);
-
-                if (newQty > max)
-                    return prev.map((x) =>
-                        x.productId === productId ? { ...x, quantity: max } : x
-                    );
-
-                return prev.map((x) =>
-                    x.productId === productId
-                        ? { ...x, quantity: newQty }
-                        : x
-                );
-            }
-
-            if (change > 0) {
-                return [...prev, { productId, quantity: 1 }];
-            }
-
-            return prev;
-        });
-    };
-
-    const getCartQuantity = (id: number) =>
-        cartItems.find((x) => x.productId === id)?.quantity || 0;
 
     // ------------------- Fetch products --------------------
     const fetchProducts = async () => {
@@ -166,7 +129,7 @@ export function CataloguePage() {
                     {filteredProducts.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {filteredProducts.map((product) => {
-                                const qty = getCartQuantity(product.id);
+                                const qty = getQuantity(product.id); // ⭐ cantidad desde contexto
 
                                 return (
                                     <Card
@@ -197,21 +160,33 @@ export function CataloguePage() {
                                             </p>
                                         </CardContent>
 
-                                        <CardFooter className="p-5 flex justify-between items-center">
+                                        {/* ⭐ Aquí se arregla el ADD al carrito */}
+                                        <CardFooter className="p-5 flex text-white justify-between items-center">
                                             <Button
+                                                text-color={""}
                                                 variant="outline"
                                                 size="icon"
-                                                onClick={() => handleAddToCart(product.id, -1)}
+                                                onClick={() =>
+                                                    addItem(product.id, -1, {
+                                                        name: product.name,
+                                                        price: product.unitPrice,
+                                                    })
+                                                }
                                                 disabled={qty === 0}
                                             >
                                                 -
                                             </Button>
 
-                                            <span className="text-xl font-bold">{qty}</span>
+                                            <span className="text-xl text-black font-bold">{qty}</span>
 
                                             <Button
                                                 size="icon"
-                                                onClick={() => handleAddToCart(product.id, 1)}
+                                                onClick={() =>
+                                                    addItem(product.id, 1, {
+                                                        name: product.name,
+                                                        price: product.unitPrice,
+                                                    })
+                                                }
                                                 disabled={qty >= product.stock}
                                             >
                                                 +
@@ -231,3 +206,4 @@ export function CataloguePage() {
         </AppLayout>
     );
 }
+    
