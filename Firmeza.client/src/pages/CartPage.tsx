@@ -1,146 +1,168 @@
-import { useCart } from "../context/CartContext";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { AppLayout } from "@/layouts/AppLayout";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { AppLayout } from "@/layouts/AppLayout";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+import { useCart } from "../context/CartContext";
+import api from "../api/axiosInstance";
 
 export function CartPage() {
-    const { cart, addItem, removeItem, clearCart } = useCart();
     const navigate = useNavigate();
+    const { cartItems, addItem, removeItem, deleteItem, total, clearCart } = useCart();
 
-    const products = Object.values(cart || {});
+    // -------------------- FINALIZAR COMPRA --------------------
+    const handleCheckout = async () => {
+        try {
+            const token = localStorage.getItem("jwt_token");
+            if (!token) return;
 
-    const subtotal = products.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    );
+            // Extraer datos del JWT
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            const userId = payload.sub;
 
-    const iva = subtotal * 0.19;
-    const total = subtotal + iva;
+            const sale = {
+                customerId: parseInt(userId),
+                customers: [],
+                products: [],
+                saleDetails: cartItems.map((item) => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    appliedUnitPrice: item.price,
+                })),
+                subtotal: total,
+                iva: total * 0.19,
+                total: total * 1.19,
+            };
 
-    const handleLogout = () => {
-        localStorage.removeItem("jwt_token");
-        navigate("/login", { replace: true });
+            const res = await api.post("/sales", sale, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: "blob", // PDF
+            });
+
+            // Descargar PDF
+            const blob = new Blob([res.data], { type: "application/pdf" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "factura.pdf";
+            a.click();
+
+            clearCart();
+            navigate("/");
+
+        } catch (error) {
+            console.error("Error al finalizar compra:", error);
+            alert("No se pudo generar la venta.");
+        }
     };
 
+    // -------------------- UI --------------------
     return (
-        <AppLayout onLogout={handleLogout}>
-            <div className="max-w-4xl mx-auto p-6">
-                <h1 className="text-4xl font-bold mb-6">🛒 Tu carrito</h1>
+        <AppLayout>
+            <div className="max-w-3xl mx-auto mt-10">
 
-                {/* Carrito vacío */}
-                {products.length === 0 && (
-                    <Card className="p-10 text-center">
-                        <p className="text-gray-500 text-xl">
-                            Tu carrito está vacío.
-                        </p>
+                <h1 className="text-3xl font-bold mb-6">🛒 Mi Carrito</h1>
 
-                        <Button
-                            className="mt-5"
-                            onClick={() => navigate("/catalogue")}
-                        >
-                            Volver al catálogo
-                        </Button>
-                    </Card>
-                )}
+                {cartItems.length === 0 ? (
+                    <p className="text-gray-500 text-lg text-center py-20">
+                        Tu carrito está vacío.
+                    </p>
+                ) : (
+                    <Card className="shadow-xl border rounded-2xl">
+                        <CardContent className="p-6 space-y-6">
 
-                {/* Lista de productos */}
-                {products.length > 0 && (
-                    <div className="space-y-5">
-                        {products.map((item) => (
-                            <Card key={item.id} className="p-4 flex items-center gap-4">
-                                <img
-                                    src={`https://placehold.co/120x120/e5e7eb/374151?text=${item.name}`}
-                                    alt={item.name}
-                                    className="w-28 h-28 rounded-lg object-cover border"
-                                />
+                            {cartItems.map((item) => (
+                                <div key={item.productId}>
+                                    <div className="flex justify-between items-center">
 
-                                <CardContent className="flex-1 p-0">
-                                    <h2 className="font-bold text-xl">{item.name}</h2>
+                                        {/* Info principal */}
+                                        <div>
+                                            <h3 className="font-bold text-lg">{item.name}</h3>
+                                            <p className="text-gray-600">
+                                                Precio:{" "}
+                                                <span className="font-semibold">
+                                                    ${item.price?.toLocaleString("es-CO")}
+                                                </span>
+                                            </p>
+                                        </div>
 
-                                    <p className="text-gray-600">
-                                        Precio:{" "}
-                                        <span className="font-bold text-indigo-600">
-                                            ${item.price.toLocaleString("es-CO")}
-                                        </span>
-                                    </p>
+                                        {/* Controles */}
+                                        <div className="flex items-center gap-3">
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => removeItem(item.productId)}
+                                            >
+                                                -
+                                            </Button>
 
-                                    {/* Controles de cantidad */}
-                                    <div className="flex items-center gap-3 mt-3">
-                                        <Button
-                                            size="icon"
-                                            variant="outline"
-                                            onClick={() => addItem(item.id, -1)}
-                                        >
-                                            -
-                                        </Button>
+                                            <span className="text-xl font-bold">
+                                                {item.quantity}
+                                            </span>
 
-                                        <span className="text-xl font-semibold">
-                                            {item.quantity}
-                                        </span>
+                                            <Button
+                                                size="icon"
+                                                onClick={() =>
+                                                    addItem(item.productId, 1, {
+                                                        name: item.name,
+                                                        price: item.price,
+                                                    })
+                                                }
+                                            >
+                                                +
+                                            </Button>
 
-                                        <Button
-                                            size="icon"
-                                            onClick={() => addItem(item.id, 1)}
-                                        >
-                                            +
-                                        </Button>
-
-                                        <Button
-                                            variant="destructive"
-                                            className="ml-auto"
-                                            onClick={() => removeItem(item.id)}
-                                        >
-                                            Eliminar
-                                        </Button>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={() => deleteItem(item.productId)}
+                                            >
+                                                Quitar
+                                            </Button>
+                                        </div>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        ))}
 
-                        {/* Resumen */}
-                        <Card className="p-6 mt-6">
-                            <h2 className="text-2xl font-bold mb-4">Resumen</h2>
+                                    <Separator className="my-4" />
+                                </div>
+                            ))}
 
-                            <div className="flex justify-between text-lg mb-2">
-                                <span>Subtotal</span>
-                                <span>${subtotal.toLocaleString("es-CO")}</span>
+                            {/* Totales */}
+                            <div className="text-right space-y-2">
+                                <p className="text-lg">
+                                    Subtotal:{" "}
+                                    <span className="font-semibold">
+                                        ${total.toLocaleString("es-CO")}
+                                    </span>
+                                </p>
+                                <p className="text-lg">
+                                    IVA 19%:{" "}
+                                    <span className="font-semibold">
+                                        ${(total * 0.19).toLocaleString("es-CO")}
+                                    </span>
+                                </p>
+
+                                <h2 className="text-2xl font-bold">
+                                    Total:{" "}
+                                    <span className="text-indigo-600">
+                                        ${(total * 1.19).toLocaleString("es-CO")}
+                                    </span>
+                                </h2>
                             </div>
+                        </CardContent>
 
-                            <div className="flex justify-between text-lg mb-2">
-                                <span>IVA (19%)</span>
-                                <span>${iva.toLocaleString("es-CO")}</span>
-                            </div>
-
-                            <Separator className="my-4" />
-
-                            <div className="flex justify-between text-2xl font-bold mb-6">
-                                <span>Total</span>
-                                <span>${total.toLocaleString("es-CO")}</span>
-                            </div>
-
-                            <div className="flex gap-4">
-                                <Button
-                                    className="flex-1 text-lg py-6"
-                                    onClick={() => navigate("/checkout")}
-                                >
-                                    Finalizar compra
-                                </Button>
-
-                                <Button
-                                    variant="outline"
-                                    className="flex-1 text-lg py-6"
-                                    onClick={clearCart}
-                                >
-                                    Vaciar carrito
-                                </Button>
-                            </div>
-                        </Card>
-                    </div>
+                        <CardFooter className="flex justify-between p-6">
+                            <Button variant="outline" onClick={() => navigate("/catalogo")}>
+                                Seguir comprando
+                            </Button>
+                            <Button onClick={handleCheckout} className="bg-indigo-600 text-white">
+                                Finalizar compra
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 )}
             </div>
         </AppLayout>
     );
 }
-    
