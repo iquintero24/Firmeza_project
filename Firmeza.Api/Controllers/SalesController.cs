@@ -98,4 +98,12 @@ public class SalesController:ControllerBase
         }
     }
     
+    [HttpGet("customer/{customerId}")]
+    public async Task<IActionResult> GetSalesByCustomer(int customerId)
+    {
+        var result = await _saleService.GetSalesByCustomerAsync(customerId);
+        return Ok(result);
+    }
+    
+    
 }

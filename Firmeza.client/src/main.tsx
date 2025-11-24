@@ -33,6 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route element={<ProtectedRoute />}>
                             <Route path="/catalogo" element={<CataloguePage />} />
                             <Route path="/carrito" element={<CartPage />} />
+                            
                         </Route>
 
                         {/* 404 */}

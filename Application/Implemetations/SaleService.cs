@@ -195,4 +195,26 @@ public class SaleService : ISaleService
 
         return await _saleRepository.DeleteAsync(id);
     }
+    
+    // =========================================
+// GET SALES BY CUSTOMER (Historial de compras)
+// =========================================
+    public async Task<IEnumerable<SaleIndexViewModel>> GetSalesByCustomerAsync(int customerId)
+    {
+        var sales = await _saleRepository.GetSalesByCustomerAsync(customerId);
+
+        return sales.Select(s => new SaleIndexViewModel
+        {
+            Id = s.Id,
+            CustomerName = s.Customer.Name,
+            SaleDate = s.SaleDate,
+            ReceiptNumber = s.ReceiptNumber,
+            Total = s.Total,
+            PdfUrl = null // o simplemente NO incluirlo
+        }).ToList();
+
+    }
+    
+    
+
 }

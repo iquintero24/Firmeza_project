@@ -1,9 +1,8 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 import { useCart } from "../context/CartContext";
@@ -17,16 +16,14 @@ export function CartPage() {
     const handleCheckout = async () => {
         try {
             const token = localStorage.getItem("jwt_token");
-            if (!token) return;
+            if (!token) return alert("No hay sesión activa.");
 
             // Extraer datos del JWT
             const payload = JSON.parse(atob(token.split(".")[1]));
-            const userId = payload.sub;
+            const customerId = parseInt(payload.sub);
 
             const sale = {
-                customerId: parseInt(userId),
-                customers: [],
-                products: [],
+                customerId,
                 saleDetails: cartItems.map((item) => ({
                     productId: item.productId,
                     quantity: item.quantity,
@@ -39,12 +36,13 @@ export function CartPage() {
 
             const res = await api.post("/sales", sale, {
                 headers: { Authorization: `Bearer ${token}` },
-                responseType: "blob", // PDF
+                responseType: "blob", // Para descargar PDF
             });
 
             // Descargar PDF
             const blob = new Blob([res.data], { type: "application/pdf" });
             const url = window.URL.createObjectURL(blob);
+
             const a = document.createElement("a");
             a.href = url;
             a.download = "factura.pdf";
@@ -78,7 +76,7 @@ export function CartPage() {
                                 <div key={item.productId}>
                                     <div className="flex justify-between items-center">
 
-                                        {/* Info principal */}
+                                        {/* Info producto */}
                                         <div>
                                             <h3 className="font-bold text-lg">{item.name}</h3>
                                             <p className="text-gray-600">
@@ -156,6 +154,7 @@ export function CartPage() {
                             <Button variant="outline" onClick={() => navigate("/catalogo")}>
                                 Seguir comprando
                             </Button>
+
                             <Button onClick={handleCheckout} className="bg-indigo-600 text-white">
                                 Finalizar compra
                             </Button>

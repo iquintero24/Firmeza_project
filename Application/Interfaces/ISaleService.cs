@@ -9,4 +9,7 @@ public interface ISaleService
     Task<SaleIndexViewModel> CreateSaleAsync(SaleCreateViewModel model);
     Task<bool> UpdateSaleAsync(SaleEditViewModel model);
     Task<bool> DeleteSaleAsync(int id);
+    Task<IEnumerable<SaleIndexViewModel>> GetSalesByCustomerAsync(int customerId);
+    
+    
 }
