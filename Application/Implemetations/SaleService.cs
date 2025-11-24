@@ -3,6 +3,7 @@ using Firmeza.Application.Interfaces;
 using Firmeza.Domain.Entities;
 using Firmeza.Domain.Interfaces;
 using Infrastructure.Utils;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Firmeza.Application.Implemetations;
 
@@ -11,12 +12,18 @@ public class SaleService : ISaleService
     private readonly ISaleRepository _saleRepository;
     private readonly ICustomerRepository _customerRepository;
     private readonly IProductRepository _productRepository;
+    private readonly IEmailService _emailService;
+    private readonly IWebHostEnvironment _env;
 
-    public SaleService(ISaleRepository saleRepository, ICustomerRepository customerRepository, IProductRepository productRepository)
+    public SaleService(ISaleRepository saleRepository, ICustomerRepository customerRepository,
+        IProductRepository productRepository, IEmailService emailService, IWebHostEnvironment env)
     {
         _saleRepository = saleRepository;
         _customerRepository = customerRepository;
         _productRepository = productRepository;
+        _emailService = emailService;
+        _env = env; 
+        
     }
 
     // =========================================
@@ -66,61 +73,76 @@ public class SaleService : ISaleService
     // =========================================
     // CREATE SALE (ya lo tenías)
     // =========================================
-    public async Task<SaleIndexViewModel> CreateSaleAsync(SaleCreateViewModel model)
+   public async Task<SaleIndexViewModel> CreateSaleAsync(SaleCreateViewModel model)
+{
+    var customer = await _customerRepository.GetByIdAsync(model.CustomerId);
+    if (customer == null)
+        throw new InvalidOperationException($"Customer with id {model.CustomerId} does not exist");
+
+    var sale = new Sale
     {
-        var customer = await _customerRepository.GetByIdAsync(model.CustomerId);
-        if (customer == null)
-            throw new InvalidOperationException($"Customer with id {model.CustomerId} does not exist");
+        CustomerId = model.CustomerId,
+        SaleDate = DateTime.UtcNow,
+        ReceiptNumber = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(),
+        Subtotal = model.Subtotal,
+        Iva = model.Iva,
+        Total = model.Total,
+        Customer = customer,
+        SaleDetails = new List<SaleDetail>()
+    };
 
-        var sale = new Sale
+    foreach (var item in model.SaleDetails)
+    {
+        var product = await _productRepository.GetByIdAsync(item.ProductId);
+        if (product == null)
+            throw new InvalidOperationException($"Product with id {item.ProductId} does not exist");
+
+        if (product.Stock < item.Quantity)
+            throw new InvalidOperationException($"Product with id {item.ProductId} does not have enough stock");
+
+        product.Stock -= item.Quantity;
+        await _productRepository.UpdateAsync(product);
+
+        sale.SaleDetails.Add(new SaleDetail
         {
-            CustomerId = model.CustomerId,
-            SaleDate = DateTime.UtcNow,
-            ReceiptNumber = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(),
-            Subtotal = model.Subtotal,
-            Iva = model.Iva,
-            Total = model.Total,
-            Customer = customer,
-            SaleDetails = new List<SaleDetail>()
-        };
-
-        foreach (var item in model.SaleDetails)
-        {
-            var product = await _productRepository.GetByIdAsync(item.ProductId);
-            if (product == null)
-                throw new InvalidOperationException($"Product with id {item.ProductId} does not exist");
-
-            if (product.Stock < item.Quantity)
-                throw new InvalidOperationException($"Product with id {item.ProductId} does not have enough stock");
-
-            product.Stock -= item.Quantity;
-            await _productRepository.UpdateAsync(product);
-
-            sale.SaleDetails.Add(new SaleDetail
-            {
-                ProductId = item.ProductId,
-                Quantity = item.Quantity,
-                AppliedUnitPrice = item.AppliedUnitPrice,
-                Product = product
-            });
-        }
-
-        var savedSale = await _saleRepository.AddAsync(sale);
-        
-        // generate pdf 
-        var pdfPath = PdfGenerator.GenerateSaleReceipt(savedSale);
-
-        return new SaleIndexViewModel
-        {
-            Id = savedSale.Id,
-            CustomerName = customer.Name,
-            SaleDate = savedSale.SaleDate,
-            ReceiptNumber = savedSale.ReceiptNumber,
-            Total = savedSale.Total,
-            PdfUrl = pdfPath
-            
-        };
+            ProductId = item.ProductId,
+            Quantity = item.Quantity,
+            AppliedUnitPrice = item.AppliedUnitPrice,
+            Product = product
+        });
     }
+
+    var savedSale = await _saleRepository.AddAsync(sale);
+
+    // 1️⃣ Generar PDF
+    var pdfRelativePath = PdfGenerator.GenerateSaleReceipt(savedSale);
+
+    // Convertimos a ruta absoluta en disco
+    var pdfFullPath = Path.Combine(_env.WebRootPath, "Receipt", Path.GetFileName(pdfRelativePath));
+
+    // 2️⃣ Enviar correo con el PDF adjunto
+    if (!string.IsNullOrWhiteSpace(customer.Email))
+    {
+        await _emailService.SendEmailWithPdf(
+            toEmail: customer.Email,
+            subject: "Your Purchase Receipt",
+            body: $"<p>Hi {customer.Name},</p><p>Thanks for your purchase! Your receipt is attached.</p>",
+            pdfFullPath: pdfFullPath
+        );
+    }
+
+    // 3️⃣ Retornar respuesta al frontend
+    return new SaleIndexViewModel
+    {
+        Id = savedSale.Id,
+        CustomerName = customer.Name,
+        SaleDate = savedSale.SaleDate,
+        ReceiptNumber = savedSale.ReceiptNumber,
+        Total = savedSale.Total,
+        PdfUrl = pdfRelativePath
+    };
+}
+
 
     // =========================================
     // UPDATE SALE

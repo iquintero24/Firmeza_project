@@ -31,8 +31,14 @@ public class SaleRepository : GenericRepository<Sale>, ISaleRepository
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public Task<IEnumerable<Sale>> GetSalesByCustomerAsync(int customerId)
+    public async Task<IEnumerable<Sale>> GetSalesByCustomerAsync(int customerId)
     {
-        throw new NotImplementedException();
+        return await _context.Sales
+            .Where(s => s.CustomerId == customerId)
+            .Include(s => s.Customer)
+            .Include(s => s.SaleDetails)
+            .ThenInclude(d => d.Product)
+            .OrderByDescending(s => s.SaleDate)
+            .ToListAsync();
     }
 }

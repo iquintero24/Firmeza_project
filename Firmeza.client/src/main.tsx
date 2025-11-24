@@ -9,31 +9,32 @@ import { CataloguePage } from './pages/CataloguePage.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { RegisterPage } from './pages/RegisterPage.tsx';
 
-// ⭐ IMPORTANTE: importar el provider global del carrito
+// Provider carrito
 import { CartProvider } from "./context/CartContext.tsx";
 
-
-// ⭐ IMPORTA LA PÁGINA DEL CARRITO
+// Páginas
 import { CartPage } from "./pages/CartPage.tsx";
+import SalesHistoryPage from "./pages/SalesHistoryPage.tsx"; // 👈 IMPORTACIÓN CORRECTA
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        {/* 🔥 Ahora toda la app tiene acceso al carrito */}
         <CartProvider>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<App />}>
 
-                        {/* Rutas públicas */}
+                        {/* Públicas */}
                         <Route index element={<LoginPage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
 
-                        {/* Rutas protegidas */}
+                        {/* Protegidas */}
                         <Route element={<ProtectedRoute />}>
                             <Route path="/catalogo" element={<CataloguePage />} />
                             <Route path="/carrito" element={<CartPage />} />
-                            
+
+                            {/* 👇 NUEVA RUTA DEL HISTORIAL */}
+                            <Route path="/cuenta/pedidos" element={<SalesHistoryPage />} />
                         </Route>
 
                         {/* 404 */}

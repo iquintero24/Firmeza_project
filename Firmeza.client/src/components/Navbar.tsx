@@ -109,11 +109,6 @@ export function Navbar({ onLogout }: NavbarProps) {
 
     const cuentaMenu = [
         {
-            title: "Mi Perfil",
-            href: "/cuenta/perfil",
-            description: "Gestiona tu información personal."
-        },
-        {
             title: "Historial de Pedidos",
             href: "/cuenta/pedidos",
             description: "Consulta tus pedidos previos."
