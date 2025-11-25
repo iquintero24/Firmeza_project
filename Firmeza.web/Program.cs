@@ -80,6 +80,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
 // --------------------
 // Build the app
 var app = builder.Build();

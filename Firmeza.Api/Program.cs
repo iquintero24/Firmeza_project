@@ -96,6 +96,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
@@ -136,6 +138,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ClientPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+    });
+});
+
 // ============================================
 // 🔹 BUILD APPLICATION
 // ============================================
@@ -153,6 +163,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("ClientPolicy");
 
 // 👇 ESTA LÍNEA MAPEARÁ TODOS TUS CONTROLADORES
 app.MapControllers();

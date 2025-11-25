@@ -5,5 +5,5 @@ namespace Firmeza.Domain.Interfaces;
 
 public interface ISaleRepository: IGenericRepository<Sale>
 {
-    
+    Task<IEnumerable<Sale>> GetSalesByCustomerAsync(int customerId);
 }

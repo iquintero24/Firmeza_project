@@ -30,4 +30,15 @@ public class SaleRepository : GenericRepository<Sale>, ISaleRepository
             .ThenInclude(d => d.Product)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
+
+    public async Task<IEnumerable<Sale>> GetSalesByCustomerAsync(int customerId)
+    {
+        return await _context.Sales
+            .Where(s => s.CustomerId == customerId)
+            .Include(s => s.Customer)
+            .Include(s => s.SaleDetails)
+            .ThenInclude(d => d.Product)
+            .OrderByDescending(s => s.SaleDate)
+            .ToListAsync();
+    }
 }
