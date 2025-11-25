@@ -96,6 +96,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 

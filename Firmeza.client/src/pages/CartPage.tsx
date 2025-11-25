@@ -20,18 +20,26 @@ export function CartPage() {
 
             // Extraer datos del JWT
             const payload = JSON.parse(atob(token.split(".")[1]));
-            const customerId = parseInt(payload.sub);
+            const customerId = payload.sub; // <<--- STRING CORRECTO
+
+            if (!customerId) {
+                alert("El token no contiene un usuario válido.");
+                return;
+            }
+
+            const iva = +(total * 0.19).toFixed(2);
+            const totalFinal = +(total + iva).toFixed(2);
 
             const sale = {
-                customerId,
+                customerId, // <<--- STRING, NO number
                 saleDetails: cartItems.map((item) => ({
                     productId: item.productId,
                     quantity: item.quantity,
                     appliedUnitPrice: item.price,
                 })),
                 subtotal: total,
-                iva: total * 0.19,
-                total: total * 1.19,
+                iva,
+                total: totalFinal,
             };
 
             const res = await api.post("/sales", sale, {
@@ -48,12 +56,21 @@ export function CartPage() {
             a.download = "factura.pdf";
             a.click();
 
+            window.URL.revokeObjectURL(url);
+
             clearCart();
             navigate("/");
 
         } catch (error) {
             console.error("Error al finalizar compra:", error);
-            alert("No se pudo generar la venta.");
+
+            if (error?.response?.data) {
+                const reader = new FileReader();
+                reader.onload = () => alert(reader.result);
+                reader.readAsText(error.response.data);
+            } else {
+                alert("No se pudo generar la venta.");
+            }
         }
     };
 

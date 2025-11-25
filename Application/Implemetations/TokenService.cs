@@ -5,47 +5,60 @@ using Firmeza.Application.Interfaces;
 using Firmeza.Domain.Entities;
 using Firmeza.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Firmeza.Application.Implemetations;
-
-public class TokenService: ITokenService
+namespace Firmeza.Application.Implemetations
 {
-    
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public TokenService(UserManager<ApplicationUser> userManager)
+    public class TokenService : ITokenService
     {
-        _userManager = userManager;
-    }
-    
-    public async Task<string> CreateTokenAsync(ApplicationUser user)
-    {
-        var SecretKey = Environment.GetEnvironmentVariable("TOKEN_JWT");
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
 
-        if (string.IsNullOrEmpty(SecretKey))
+        public TokenService(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
-            throw new Exception("TOKEN_JWT not configuration in the file .env");
+            _userManager = userManager;
+            _context = context;
         }
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var claims = new List<Claim>
+        public async Task<string> CreateTokenAsync(ApplicationUser user)
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName ?? ""),
-            new Claim(ClaimTypes.Email, user.Email ?? ""),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-        
-        // get the roles of entity
-        var roles = await _userManager.GetRolesAsync(user);
-        foreach (var role in roles ) claims.Add(new Claim(ClaimTypes.Role, role));
+            var SecretKey = Environment.GetEnvironmentVariable("TOKEN_JWT");
 
-            var token = new JwtSecurityToken(claims: claims,expires: DateTime.UtcNow.AddHours(2),signingCredentials:creds);
-            
+            if (string.IsNullOrEmpty(SecretKey))
+                throw new Exception("TOKEN_JWT not configured in .env");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            // Buscar customer asociado al usuario (IdentityUserId)
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id), // ID de Identity
+                new Claim(ClaimTypes.Email, user.Email ?? ""),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName ?? ""),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            // 👉 AGREGAR customerId si existe
+            if (customer != null)
+                claims.Add(new Claim("customerId", customer.Id.ToString()));
+
+            // Roles
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+                claims.Add(new Claim(ClaimTypes.Role, role));
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2),
+                signingCredentials: creds
+            );
+
             return new JwtSecurityTokenHandler().WriteToken(token);
-            
+        }
     }
 }

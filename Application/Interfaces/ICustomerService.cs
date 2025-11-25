@@ -16,4 +16,6 @@ public interface ICustomerService
     Task<bool> DeleteCustomerAsync(int id);
     
     Task<bool> IsDocumentOrEmailDuplicateAsync(int id, string document, string email);
+    
+    Task<CustomerIndexViewModel?> GetCustomerByIdentityUserIdAsync(string identityUserId);
 }
