@@ -20,7 +20,7 @@ export function CartPage() {
 
             // Extraer datos del JWT
             const payload = JSON.parse(atob(token.split(".")[1]));
-            const customerId = payload.sub; // <<--- STRING CORRECTO
+            const customerId = payload.customerId; // <<--- STRING CORRECTO
 
             if (!customerId) {
                 alert("El token no contiene un usuario válido.");
@@ -59,7 +59,7 @@ export function CartPage() {
             window.URL.revokeObjectURL(url);
 
             clearCart();
-            navigate("/");
+            navigate("/carrito");
 
         } catch (error) {
             console.error("Error al finalizar compra:", error);

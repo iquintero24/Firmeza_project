@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# 🛒 Client App – Frontend
+Aplicación cliente construida en **React + TypeScript**, enfocada en la gestión de clientes, ventas y productos. Proporciona una interfaz moderna, segura y fácil de usar para interactuar con la API del sistema.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📌 Características principales
+- Gestión de clientes y productos desde una interfaz intuitiva.
+- Actualización dinámica de precios, cantidades y totales.
+- Carrito funcional con recálculo automático.
+- Manejo completo de sesión de usuario y autenticación JWT.
+- Componentes reutilizables con TailwindCSS + Lucide Icons.
+- Integración total con la API (axios instance configurada).
+- Arquitectura limpia: pages, components, hooks y services.
 
-Currently, two official plugins are available:
+## 🏗️ Tecnologías utilizadas
+| Área | Tecnología |
+|------|------------|
+| Lenguaje | TypeScript |
+| Framework | React |
+| Enrutamiento | React Router DOM |
+| UI | TailwindCSS + Lucide React |
+| Estado / Data fetching | Hooks + Context |
+| HTTP Client | Axios |
+| Build | Vite |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📂 Estructura del proyecto
+client/
+│── src/
+│   ├── api/
+│   │   └── axiosInstance.ts
+│   ├── components/
+│   │   ├── Navbar.tsx
+│   │   └── LoginForm.tsx
+│   ├── pages/
+│   │   ├── LoginPage.tsx
+│   │   └── EditSale.tsx
+│   ├── hooks/
+│   ├── context/
+│   ├── types/
+│   ├── App.tsx
+│   └── main.tsx
+│── public/
+│── package.json
+│── tsconfig.json
+│── README.md
 
-## React Compiler
+## ⚙️ Instalación y ejecución local
+Requisitos:
+- Node.js 18+
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+Instalar dependencias:
+npm install
 
-## Expanding the ESLint configuration
+Configurar .env:
+VITE_API_URL=http://localhost:5000/api
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Ejecutar:
+npm run dev
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Build:
+npm run build
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🐳 Docker
+Construir:
+docker build -t client-app .
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Ejecutar:
+docker run -p 5173:80 client-app
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🔐 Autenticación
+Se usa JWT desde localStorage.authToken.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🔗 Integración API
+Todas las llamadas pasan por src/api/axiosInstance.ts.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🎨 Estilos
+TailwindCSS + lucide-react.

@@ -19,7 +19,32 @@ namespace Firmeza.Api.Controllers
             _mapper = mapper;
         }
 
-        // ✅ GET api/customers
+        // ============================================================
+        // 🔐 GET api/customers/me        (Customer autenticado)
+        // ============================================================
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyCustomer()
+        {
+            var identityUserId = User?.FindFirst("sub")?.Value 
+                                 ?? User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (identityUserId == null)
+                return Unauthorized("Unable to determine the authenticated user ID.");
+
+            var customer = await _customerService.GetCustomerByIdentityUserIdAsync(identityUserId);
+
+            if (customer == null)
+                return NotFound("Customer not found for this user.");
+
+            return Ok(customer);
+        }
+
+        // ============================================================
+        // ADMIN ONLY
+        // ============================================================
+
+        // GET api/customers
         [Authorize(Roles = "Administrator")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerIndexViewModel>>> GetAll()
@@ -28,7 +53,7 @@ namespace Firmeza.Api.Controllers
             return Ok(customers);
         }
 
-        // ✅ GET api/customers/{id}
+        // GET api/customers/{id}
         [Authorize(Roles = "Administrator,Customer")]
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerEditViewModel>> GetById(int id)
@@ -40,7 +65,7 @@ namespace Firmeza.Api.Controllers
             return Ok(customer);
         }
 
-        // ✅ POST api/customers
+        // POST api/customers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         public async Task<ActionResult<CustomerIndexViewModel>> Create(CustomerCreateViewModel model)
@@ -56,7 +81,7 @@ namespace Firmeza.Api.Controllers
             }
         }
 
-        // ✅ PUT api/customers/{id}
+        // PUT api/customers/{id}
         [Authorize(Roles = "Administrator")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, CustomerEditViewModel model)
@@ -78,7 +103,7 @@ namespace Firmeza.Api.Controllers
             }
         }
 
-        // ✅ DELETE api/customers/{id}
+        // DELETE api/customers/{id}
         [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
