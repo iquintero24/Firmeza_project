@@ -7,6 +7,7 @@ using Firmeza.Domain.Entities;
 using Firmeza.Domain.Interfaces;
 using Firmeza.Infrastructure.Persistence;
 using Firmeza.Infrastructure.Persistence.Repositories;
+using Infrastructure.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -96,6 +97,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 
+builder.Services.AddScoped<IPdfGenerator, PdfGenerator>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 

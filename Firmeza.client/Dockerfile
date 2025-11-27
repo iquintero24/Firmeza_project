@@ -1,24 +1,25 @@
-# ============================
-# 1) BUILD DEL FRONTEND (VITE)
-# ============================
-FROM node:18 AS builder
-
+# -------------------------------------
+# 1) Build — Node 20
+# -------------------------------------
+FROM node:20 AS build
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
-
 RUN npm run build
 
+# -------------------------------------
+# 2) Deploy — NGINX
+# -------------------------------------
+FROM nginx:stable-alpine
 
-# ============================
-# 2) SERVIR CON NGINX
-# ============================
-FROM nginx:alpine
+# Copia archivos de build
+COPY --from=build /app/dist /usr/share/nginx/html
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copia configuración personalizada
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

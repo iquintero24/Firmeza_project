@@ -1,13 +1,58 @@
-﻿services:
-  firmeza.web:
-    image: firmeza.web
-    build:
-      context: .
-      dockerfile: Firmeza.web/Dockerfile
+﻿version: "3.9"
 
-  firmeza.api:
-    image: firmeza.api
+services:
+
+  firmeza-api:
     build:
       context: .
       dockerfile: Firmeza.Api/Dockerfile
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__DefaultConnection: "${SUPABASE_CONNECTION_STRING}"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - run-tests
+    networks:
+      - firmeza-net
 
+  firmeza-web:
+    build:
+      context: .
+      dockerfile: Firmeza.Web/Dockerfile
+    env_file:
+      - .env
+    environment:
+      API_BASE_URL: "http://firmeza-api:8080"
+    ports:
+      - "8082:8082"
+    networks:
+      - firmeza-net
+
+  firmeza-client:
+    build:
+      context: ./Firmeza.Client
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      VITE_API_URL: "http://firmeza-api:8080"
+    ports:
+      - "5173:80"
+    networks:
+      - firmeza-net
+
+  run-tests:
+    build:
+      context: .
+      dockerfile: Firmeza.Tests/Dockerfile
+    env_file:
+      - .env
+    networks:
+      - firmeza-net
+
+networks:
+  firmeza-net:
+    driver: bridge
