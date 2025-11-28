@@ -24,7 +24,7 @@ export function LoginPage() {
                 </div>
 
                 <p className="text-center text-sm text-gray-500 pt-6 border-t mt-6 border-gray-100">
-                    ¿No tienes cuenta? <a href="/registro" className="text-indigo-600 hover:text-indigo-500 font-semibold transition duration-150">Regístrate aquí</a>
+                    ¿No tienes cuenta? <a href="/register" className="text-indigo-600 hover:text-indigo-500 font-semibold transition duration-150">Regístrate aquí</a>
                 </p>
             </div>
         </div>
