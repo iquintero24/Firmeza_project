@@ -1,15 +1,18 @@
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-interface CartItem {
+// ==================
+// 🛒 Tipos
+// ==================
+export interface CartItem {
     productId: number;
+    name: string;     
+    price: number;    
     quantity: number;
-    price?: number;   // Opcional pero útil
-    name?: string;
 }
 
 interface CartContextType {
     cartItems: CartItem[];
-    addItem: (productId: number, delta?: number, productInfo?: any) => void;
+    addItem: (productId: number, delta?: number, info?: { name: string; price: number }) => void;
     removeItem: (productId: number) => void;
     deleteItem: (productId: number) => void;
     clearCart: () => void;
@@ -17,22 +20,35 @@ interface CartContextType {
     total: number;
 }
 
+// ==================
+// 🧠 Contexto
+// ==================
 const CartContext = createContext<CartContextType | null>(null);
 
+// ==================
+// 🛍 Provider
+// ==================
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-    const addItem = (productId: number, delta = 1, productInfo?: any) => {
+    // -------------------------
+    // ➕ Agregar Items
+    // -------------------------
+    const addItem = (
+        productId: number,
+        delta: number = 1,
+        info?: { name: string; price: number }
+    ) => {
         setCartItems((prev) => {
             const existing = prev.find((x) => x.productId === productId);
-            const currentQty = existing?.quantity ?? 0;
 
-            const newQty = currentQty + delta;
+            const newQty = (existing?.quantity ?? 0) + delta;
 
-            if (newQty <= 0)
+            if (newQty <= 0) {
                 return prev.filter((x) => x.productId !== productId);
+            }
 
-            // Si el item ya existe
+            // Si ya existe → solo cambia cantidad
             if (existing) {
                 return prev.map((x) =>
                     x.productId === productId
@@ -41,14 +57,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 );
             }
 
-            // Si no existe, lo agrega con info opcional
+            // Si no existe, se agrega (info ES OBLIGATORIA)
+            if (!info) {
+                console.error("addItem requires product info for new items");
+                return prev;
+            }
+
             return [
                 ...prev,
                 {
                     productId,
                     quantity: newQty,
-                    name: productInfo?.name,
-                    price: productInfo?.price,
+                    name: info.name,
+                    price: info.price,
                 },
             ];
         });
@@ -65,10 +86,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const clearCart = () => setCartItems([]);
 
     const getQuantity = (productId: number) =>
-        cartItems.find((x) => x.productId === productId)?.quantity || 0;
+        cartItems.find((x) => x.productId === productId)?.quantity ?? 0;
 
     const total = cartItems.reduce(
-        (sum, item) => sum + (item.price ?? 0) * item.quantity,
+        (sum, item) => sum + item.price * item.quantity,
         0
     );
 
@@ -89,6 +110,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
+// ==================
+// 🎣 Hook
+// ==================
 export const useCart = () => {
     const ctx = useContext(CartContext);
     if (!ctx) throw new Error("useCart must be used inside CartProvider");

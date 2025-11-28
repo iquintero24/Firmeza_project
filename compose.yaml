@@ -1,58 +1,55 @@
 ﻿version: "3.9"
 
 services:
-
-  firmeza-api:
+  api:
     build:
       context: .
       dockerfile: Firmeza.Api/Dockerfile
-    env_file:
-      - .env
-    environment:
-      ASPNETCORE_ENVIRONMENT: "Production"
-      ConnectionStrings__DefaultConnection: "${SUPABASE_CONNECTION_STRING}"
+    container_name: api
     ports:
       - "8080:8080"
-    depends_on:
-      - run-tests
+    env_file:
+      - Firmeza.Api/.env
     networks:
-      - firmeza-net
+      - firmeza_net
 
-  firmeza-web:
+  web:
     build:
       context: .
-      dockerfile: Firmeza.Web/Dockerfile
-    env_file:
-      - .env
-    environment:
-      API_BASE_URL: "http://firmeza-api:8080"
+      dockerfile: Firmeza.web/Dockerfile
+    container_name: web
     ports:
       - "8082:8082"
-    networks:
-      - firmeza-net
-
-  firmeza-client:
-    build:
-      context: ./Firmeza.Client
-      dockerfile: Dockerfile
     env_file:
-      - .env
-    environment:
-      VITE_API_URL: "http://firmeza-api:8080"
+      - Firmeza.web/.env
+    depends_on:
+      - api
+    networks:
+      - firmeza_net
+
+  client:
+    build:
+      context: ./Firmeza.client
+      dockerfile: Dockerfile
+    container_name: client
     ports:
       - "5173:80"
+    depends_on:
+      - api
     networks:
-      - firmeza-net
+      - firmeza_net
 
-  run-tests:
+  tests:
     build:
       context: .
       dockerfile: Firmeza.Tests/Dockerfile
-    env_file:
-      - .env
+    container_name: tests
+    depends_on:
+      - api
     networks:
-      - firmeza-net
+      - firmeza_net
+    command: ["dotnet", "test", "--logger:trx"]
 
 networks:
-  firmeza-net:
+  firmeza_net:
     driver: bridge

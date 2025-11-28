@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import api from '../api/axiosInstance'; // 👈 Importación corregida
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 // 1. Esquema de Validación con Zod
