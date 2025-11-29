@@ -6,6 +6,7 @@ using Firmeza.Domain.Interfaces;
 using Firmeza.Infrastructure.Persistence;
 using Firmeza.Infrastructure.Persistence.Seeders;
 using Firmeza.Infrastructure.Persistence.Repositories;
+using Infrastructure.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -78,6 +79,7 @@ builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 // Register services (from Web)
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IPdfGenerator, PdfGenerator>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
