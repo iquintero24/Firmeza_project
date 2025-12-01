@@ -1,0 +1,138 @@
+@model Firmeza.Application.DTOs.Sales.SaleCreateViewModel
+
+@{
+    ViewData["Title"] = "Register Sale";
+}
+
+<h2 class="text-dark mb-4 border-bottom border-warning pb-2">🧾 Register Sale</h2>
+
+<div class="row">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg p-4 bg-dark text-white border-warning border-3">
+            <div class="card-body">
+
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- CUSTOMER -->
+                    <div class="mb-4">
+                        <label class="form-label text-warning">Customer</label>
+                        <select asp-for="CustomerId" class="form-select">
+                            <option value="">-- Select Customer --</option>
+                            @foreach (var c in ViewBag.Customers)
+                            {
+                                <option value="@c.Id">@c.Name (@c.Document)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+
+                    <!-- PRODUCTS TABLE -->
+                    <h5 class="text-warning mb-3">Products</h5>
+
+                    <table class="table table-dark table-bordered align-middle" id="saleDetailsTable">
+                        <thead class="table-warning text-dark">
+                            <tr>
+                                <th>Product</th>
+                                <th style="width:120px;">Qty</th>
+                                <th style="width:150px;">Unit Price</th>
+                                <th style="width:60px;">Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                    <button type="button" class="btn btn-outline-warning mb-3" onclick="addRow()">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+
+                    <!-- TOTALS -->
+                    <div class="mb-3">
+                        <label asp-for="Subtotal" class="form-label text-warning"></label>
+                        <input asp-for="Subtotal" class="form-control" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Iva" class="form-label text-warning"></label>
+                        <input asp-for="Iva" class="form-control" readonly />
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Total" class="form-label text-warning"></label>
+                        <input asp-for="Total" class="form-control" readonly />
+                    </div>
+
+                    <button type="submit" class="btn btn-warning fw-bold">
+                        <i class="fas fa-save me-2"></i> Register Sale
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-outline-secondary text-white ms-3">
+                        <i class="fas fa-arrow-left me-2"></i> Back
+                    </a>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const products = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Products));
+
+        function addRow() {
+            const table = document.querySelector("#saleDetailsTable tbody");
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>
+                    <select class="form-select product-select">
+                        <option value="">-- Select Product --</option>
+                       ${products.map(p => `<option value="${p.Id}" data-price="${p.UnitPrice}">${p.Name}</option>`).join("")}
+                    </select>
+                </td>
+                <td><input type="number" class="form-control qty-input" min="1" value="1"></td>
+                <td><input type="number" class="form-control price-input" step="0.01" readonly></td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove(); calculateTotals();">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            table.appendChild(row);
+
+            row.querySelector(".product-select").addEventListener("change", function () {
+                let price = this.selectedOptions[0].dataset.price;
+                row.querySelector(".price-input").value = price;
+                calculateTotals();
+            });
+
+            row.querySelector(".qty-input").addEventListener("input", calculateTotals);
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+
+            document.querySelectorAll("#saleDetailsTable tbody tr").forEach(row => {
+                let qty = row.querySelector(".qty-input").value;
+                let price = row.querySelector(".price-input").value;
+
+                if (qty && price) subtotal += qty * price;
+            });
+
+            let iva = subtotal * 0.19;
+            let total = subtotal + iva;
+
+            document.querySelector("input[name='Subtotal']").value = subtotal.toFixed(2);
+            document.querySelector("input[name='Iva']").value = iva.toFixed(2);
+            document.querySelector("input[name='Total']").value = total.toFixed(2);
+        }
+    </script>
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

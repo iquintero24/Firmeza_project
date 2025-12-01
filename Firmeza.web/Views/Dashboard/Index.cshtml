@@ -1,0 +1,102 @@
+@using Firmeza.Application.DTOs
+
+@{
+    ViewData["Title"] = "Dashboard Overview";
+
+    // Cast ViewData items to integer for safe comparison
+    var totalProducts = (int)(ViewData["TotalProducts"] ?? 0);
+    var totalCustomers = (int)(ViewData["TotalCustomers"] ?? 0);
+    var totalSales = (int)(ViewData["TotalSales"] ?? 0);
+}
+
+<h2 class="text-dark mb-4 border-bottom border-warning pb-2">ADMINISTRATIVE SUMMARY</h2>
+
+<div class="row g-4">
+    
+    <div class="col-md-4">
+        <div class="card shadow-lg bg-dark text-white h-100 border-warning border-3">
+            <div class="card-body p-4 d-flex flex-column">
+                
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="text-warning text-uppercase">Total Products</h5>
+                    <i class="fas fa-box-open fa-3x text-warning opacity-50"></i>
+                </div>
+                
+                @if (totalProducts > 0)
+                {
+                    <h1 class="display-3 fw-bolder">@totalProducts</h1>
+                    <p class="text-light mt-auto">Registered items ready for sale or rental.</p>
+                }
+                else
+                {
+                    <div class="alert alert-warning text-dark p-3 mt-auto">
+                        <h4 class="alert-heading fw-bold">No Products Found!</h4>
+                        <p class="mb-0">The product inventory is currently empty. Start registering items.</p>
+                    </div>
+                }
+                
+                <a asp-controller="Products" asp-action="Index" class="btn btn-warning mt-3 fw-bold w-100">
+                    <i class="fas fa-plus me-2"></i> @(totalProducts > 0 ? "MANAGE PRODUCTS" : "REGISTER FIRST PRODUCT")
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-lg bg-dark text-white h-100 border-warning border-3">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="text-warning text-uppercase">Total Customers</h5>
+                    <i class="fas fa-users fa-3x text-warning opacity-50"></i>
+                </div>
+                
+                @if (totalCustomers > 0)
+                {
+                    <h1 class="display-3 fw-bolder">@totalCustomers</h1>
+                    <p class="text-light mt-auto">Total active clients registered in the system.</p>
+                }
+                else
+                {
+                    <div class="alert alert-warning text-dark p-3 mt-auto">
+                        <h4 class="alert-heading fw-bold">No Customers Found!</h4>
+                        <p class="mb-0">The client list is currently empty. Customers must self-register.</p>
+                    </div>
+                }
+                
+                <a asp-controller="Customers" asp-action="Index" class="btn btn-warning mt-3 fw-bold w-100">
+                    <i class="fas fa-eye me-2"></i> VIEW CUSTOMERS LIST
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-lg bg-dark text-white h-100 border-warning border-3">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="text-warning text-uppercase">Total Sales</h5>
+                    <i class="fas fa-shopping-cart fa-3x text-warning opacity-50"></i>
+                </div>
+                
+                @if (totalSales > 0)
+                {
+                    <h1 class="display-3 fw-bolder">@totalSales</h1>
+                    <p class="text-light mt-auto">Total number of transactions completed.</p>
+                }
+                else
+                {
+                    <div class="alert alert-warning text-dark p-3 mt-auto">
+                        <h4 class="alert-heading fw-bold">No Sales Recorded!</h4>
+                        <p class="mb-0">The system has not registered any sales yet. Complete your first transaction.</p>
+                    </div>
+                }
+                
+                <a asp-controller="Sales" asp-action="Index" class="btn btn-warning mt-3 fw-bold w-100">
+                    <i class="fas fa-file-invoice-dollar me-2"></i> @(totalSales > 0 ? "VIEW SALES HISTORY" : "RECORD FIRST SALE")
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p class="mt-5 text-muted text-center">Use the navigation sidebar to manage the entity modules.</p>

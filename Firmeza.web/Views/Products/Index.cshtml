@@ -1,0 +1,88 @@
+@model IEnumerable<Firmeza.Application.DTOs.Products.ProductIndexViewModel>
+
+@{
+    ViewData["Title"] = "Products Management";
+}
+
+<h2 class="text-dark mb-4 border-bottom border-warning pb-2">📦 Product Inventory</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+}
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-action="Create" class="btn btn-warning fw-bold">
+        <i class="fas fa-plus me-2"></i> Register New Product
+    </a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="card shadow-sm bg-light text-dark p-4 mt-5 border-warning border-3">
+        <div class="card-body text-center">
+            <i class="fas fa-box-open fa-5x text-warning mb-3"></i>
+            <h4 class="card-title fw-bold">No Products Found!</h4>
+            <p class="card-text">The product inventory is currently empty. Start by registering your first item.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered shadow-sm bg-white">
+            <thead class="bg-dark text-warning">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Id)</th>
+                <th>@Html.DisplayNameFor(model => model.Name)</th>
+                <th>@Html.DisplayNameFor(model => model.UnitPrice)</th>
+                <th>@Html.DisplayNameFor(model => model.Stock)</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.UnitPrice)</td>
+                    <td>
+                        @if (item.Stock < 5)
+                        {
+                            <span class="badge bg-danger text-white">LOW (@item.Stock)</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">@item.Stock</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning me-2" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+
+                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure you want to delete product: @item.Name?');" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

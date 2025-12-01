@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  cliente:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: firmeza_cliente
+    ports:
+      - "5173:80"   # Acceso desde: http://localhost:5173
+    restart: always

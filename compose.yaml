@@ -1,7 +1,55 @@
-﻿services:
-  firmeza.web:
-    image: firmeza.web
+﻿version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Firmeza.Api/Dockerfile
+    container_name: api
+    ports:
+      - "8080:8080"
+    env_file:
+      - Firmeza.Api/.env
+    networks:
+      - firmeza_net
+
+  web:
     build:
       context: .
       dockerfile: Firmeza.web/Dockerfile
+    container_name: web
+    ports:
+      - "8082:8082"
+    env_file:
+      - .env
+    depends_on:
+      - api
+    networks:
+      - firmeza_net
 
+  client:
+    build:
+      context: ./Firmeza.client
+      dockerfile: Dockerfile
+    container_name: client
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    networks:
+      - firmeza_net
+
+  tests:
+    build:
+      context: .
+      dockerfile: Firmeza.Tests/Dockerfile
+    container_name: tests
+    depends_on:
+      - api
+    networks:
+      - firmeza_net
+    command: ["dotnet", "test", "--logger:trx"]
+
+networks:
+  firmeza_net:
+    driver: bridge
