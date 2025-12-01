@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 import { useCart } from "../context/CartContext";
+import type { CartItem } from "../context/CartContext";   // ⭐ IMPORTANTE
 import api from "../api/axiosInstance";
 
 export function CartPage() {
@@ -18,9 +19,9 @@ export function CartPage() {
             const token = localStorage.getItem("jwt_token");
             if (!token) return alert("No hay sesión activa.");
 
-            // Extraer datos del JWT
+            // Decodificar JWT
             const payload = JSON.parse(atob(token.split(".")[1]));
-            const customerId = payload.customerId; // <<--- STRING CORRECTO
+            const customerId = payload.customerId;
 
             if (!customerId) {
                 alert("El token no contiene un usuario válido.");
@@ -31,8 +32,8 @@ export function CartPage() {
             const totalFinal = +(total + iva).toFixed(2);
 
             const sale = {
-                customerId, // <<--- STRING, NO number
-                saleDetails: cartItems.map((item) => ({
+                customerId,
+                saleDetails: cartItems.map((item: CartItem) => ({
                     productId: item.productId,
                     quantity: item.quantity,
                     appliedUnitPrice: item.price,
@@ -44,7 +45,7 @@ export function CartPage() {
 
             const res = await api.post("/sales", sale, {
                 headers: { Authorization: `Bearer ${token}` },
-                responseType: "blob", // Para descargar PDF
+                responseType: "blob",
             });
 
             // Descargar PDF
@@ -61,7 +62,7 @@ export function CartPage() {
             clearCart();
             navigate("/carrito");
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error al finalizar compra:", error);
 
             if (error?.response?.data) {
@@ -89,17 +90,17 @@ export function CartPage() {
                     <Card className="shadow-xl border rounded-2xl">
                         <CardContent className="p-6 space-y-6">
 
-                            {cartItems.map((item) => (
+                            {cartItems.map((item: CartItem) => (
                                 <div key={item.productId}>
                                     <div className="flex justify-between items-center">
 
-                                        {/* Info producto */}
+                                        {/* Información del producto */}
                                         <div>
                                             <h3 className="font-bold text-lg">{item.name}</h3>
                                             <p className="text-gray-600">
                                                 Precio:{" "}
                                                 <span className="font-semibold">
-                                                    ${item.price?.toLocaleString("es-CO")}
+                                                    ${item.price.toLocaleString("es-CO")}
                                                 </span>
                                             </p>
                                         </div>
@@ -151,6 +152,7 @@ export function CartPage() {
                                         ${total.toLocaleString("es-CO")}
                                     </span>
                                 </p>
+
                                 <p className="text-lg">
                                     IVA 19%:{" "}
                                     <span className="font-semibold">

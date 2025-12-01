@@ -1,17 +1,24 @@
 /**
- * @fileoverview Componente de Barra de Navegación (Navbar)
- * Recrea la estructura de Shadcn UI (NavigationMenu, Button)
- * en un único archivo React con estilos Tailwind CSS neutrales (gris, blanco, negro).
+ * @fileoverview Navbar — versión corregida y totalmente tipada para TypeScript + Vite.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ShoppingCart, LogOut, User, Package, ListChecks, ChevronDown } from 'lucide-react';
-import { useNavigate } from "react-router-dom";   // ⭐ IMPORTANTE
+import { useNavigate } from "react-router-dom";
 
-// ---- LIST ITEM ----
-const ListItem = ({ title, children, href, ...props }) => {
+// =======================
+// ListItem
+// =======================
+
+interface ListItemProps {
+    title: string;
+    href: string;
+    children?: React.ReactNode;
+}
+
+const ListItem = ({ title, children, href }: ListItemProps) => {
     return (
-        <li {...props}>
+        <li>
             <a
                 href={href}
                 className="block select-none space-y-1 rounded-md p-3 leading-none no-underline transition-colors hover:bg-gray-100 outline-none"
@@ -27,37 +34,49 @@ const ListItem = ({ title, children, href, ...props }) => {
     );
 };
 
-// ---- BUTTON ----
-const Button = ({ children, variant = "default", className, onClick, ...props }) => {
-    let baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 shadow-sm";
-    let variantStyles = "";
+// =======================
+// Button
+// =======================
 
-    switch (variant) {
-        case 'outline':
-            variantStyles = "border border-gray-300 bg-white hover:bg-gray-100 text-gray-900";
-            break;
-        case 'destructive':
-            variantStyles = "bg-red-600 text-white hover:bg-red-700";
-            break;
-        default:
-            variantStyles = "bg-gray-900 text-white hover:bg-gray-800";
-            break;
-    }
+interface ButtonProps {
+    children: React.ReactNode;
+    variant?: "default" | "outline" | "destructive";
+    className?: string;
+    onClick?: () => void | Promise<void>;
+}
+
+const Button = ({ children, variant = "default", className = "", onClick }: ButtonProps) => {
+    const baseStyles =
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 shadow-sm";
+
+    const variants = {
+        default: "bg-gray-900 text-white hover:bg-gray-800",
+        outline: "border border-gray-300 bg-white hover:bg-gray-100 text-gray-900",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
+    };
 
     return (
         <button
-            className={`${baseStyles} ${variantStyles} ${className}`}
+            className={`${baseStyles} ${variants[variant]} ${className}`}
             onClick={onClick}
-            {...props}
         >
             {children}
         </button>
     );
 };
 
-// ---- TRIGGER ----
-const NavigationMenuTrigger = ({ children, content }) => {
+// =======================
+// NavigationMenuTrigger
+// =======================
+
+interface NavigationMenuTriggerProps {
+    children: React.ReactNode;
+    content: React.ReactNode;
+}
+
+const NavigationMenuTrigger = ({ children, content }: NavigationMenuTriggerProps) => {
     const [isOpen, setIsOpen] = useState(false);
+
     return (
         <div
             className="relative"
@@ -71,6 +90,7 @@ const NavigationMenuTrigger = ({ children, content }) => {
                 {children}
                 <ChevronDown className={`ml-1 h-4 w-4 transition duration-200 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
+
             {isOpen && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-max rounded-md border border-gray-200 bg-white shadow-lg p-4 z-50">
                     {content}
@@ -80,30 +100,32 @@ const NavigationMenuTrigger = ({ children, content }) => {
     );
 };
 
-// ---- NAVBAR ----
+// =======================
+// Navbar
+// =======================
+
 interface NavbarProps {
     onLogout?: () => void;
 }
 
 export function Navbar({ onLogout }: NavbarProps) {
-
-    const navigate = useNavigate();   // ⭐ NECESARIO PARA NAVEGAR
+    const navigate = useNavigate();
 
     const productosMenu = [
         {
             title: "Materiales Estructurales",
             href: "/productos/materiales",
-            description: "Catálogo completo de aceros, concretos y maderas para proyectos grandes."
+            description: "Catálogo completo de aceros, concretos y maderas."
         },
         {
             title: "Herramientas y Equipo",
             href: "/productos/herramientas",
-            description: "Desde maquinaria pesada hasta herramientas manuales de precisión."
+            description: "Maquinaria pesada y herramientas manuales."
         },
         {
             title: "Ferretería General",
             href: "/productos/ferreteria",
-            description: "Clavos, tornillos, tuercas y elementos de fijación esenciales."
+            description: "Clavos, tornillos y elementos de fijación."
         },
     ];
 
@@ -124,27 +146,32 @@ export function Navbar({ onLogout }: NavbarProps) {
                 </a>
 
                 <nav className="hidden lg:flex items-center gap-1">
-                    <NavigationMenuTrigger content={
-                        <ul className="grid w-[400px] gap-1 p-3">
-                            {productosMenu.map(item => (
-                                <ListItem key={item.title} title={item.title} href={item.href}>
-                                    {item.description}
-                                </ListItem>
-                            ))}
-                        </ul>
-                    }>
+
+                    <NavigationMenuTrigger
+                        content={
+                            <ul className="grid w-[400px] gap-1 p-3">
+                                {productosMenu.map(item => (
+                                    <ListItem key={item.title} title={item.title} href={item.href}>
+                                        {item.description}
+                                    </ListItem>
+                                ))}
+                            </ul>
+                        }
+                    >
                         <Package className="h-4 w-4 mr-1" /> Productos
                     </NavigationMenuTrigger>
 
-                    <NavigationMenuTrigger content={
-                        <ul className="grid w-[400px] gap-1 p-3">
-                            {cuentaMenu.map(item => (
-                                <ListItem key={item.title} title={item.title} href={item.href}>
-                                    {item.description}
-                                </ListItem>
-                            ))}
-                        </ul>
-                    }>
+                    <NavigationMenuTrigger
+                        content={
+                            <ul className="grid w-[400px] gap-1 p-3">
+                                {cuentaMenu.map(item => (
+                                    <ListItem key={item.title} title={item.title} href={item.href}>
+                                        {item.description}
+                                    </ListItem>
+                                ))}
+                            </ul>
+                        }
+                    >
                         <User className="h-4 w-4 mr-1" /> Cuenta
                     </NavigationMenuTrigger>
 
@@ -173,16 +200,4 @@ export function Navbar({ onLogout }: NavbarProps) {
     );
 }
 
-// ---- APP ----
-export default function App() {
-
-    const handleLogout = () => {
-        alert("Sesión cerrada (Simulación)");
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-50 font-sans">
-            <Navbar onLogout={handleLogout} />
-        </div>
-    );
-}
+export default Navbar;

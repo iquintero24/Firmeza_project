@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import api from '../api/axiosInstance'; // 👈 Importación corregida
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 // 1. Esquema de Validación con Zod
@@ -87,111 +87,123 @@ export function RegisterPage() {
     }
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="flex justify-center items-center min-h-screen min-w-screen bg-gray-100 p-4">
+            <div className="bg-white shadow-2xl rounded-xl p-10 w-full max-w-2xl transition-all duration-300">
+                <h2 className="text-3xl font-bold text-center mb-10 text-gray-800">
+                    Crear Cuenta
+                </h2>
 
-                {/* ⚠️ Mensaje de Éxito */}
-                {successMessage && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative text-center font-semibold" role="alert">
-                        {successMessage}
-                    </div>
-                )}
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
-                {/* ⚠️ Mensaje de Error de API/Backend */}
-                {apiError && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
-                        <span className="block sm:inline">{apiError}</span>
-                    </div>
-                )}
+                        {/* ⚠️ Mensaje de Éxito */}
+                        {successMessage && (
+                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative text-center font-semibold" role="alert">
+                                {successMessage}
+                            </div>
+                        )}
 
-                {/* --- Campos del Formulario --- */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-gray-700">Nombre Completo</FormLabel>
-                                <FormControl><Input placeholder="John Doe" className="h-10 rounded-xl" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
+                        {/* ⚠️ Mensaje de Error de API/Backend */}
+                        {apiError && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
+                                <span className="block sm:inline">{apiError}</span>
+                            </div>
                         )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="document"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-gray-700">Documento/Cédula</FormLabel>
-                                <FormControl><Input placeholder="1020304050" className="h-10 rounded-xl" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-gray-700">Correo Electrónico</FormLabel>
-                                <FormControl><Input type="email" placeholder="user@example.com" className="h-10 rounded-xl" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-gray-700">Teléfono</FormLabel>
-                                <FormControl><Input placeholder="3001234567" className="h-10 rounded-xl" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
+                        {/* --- Campos del Formulario --- */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-700">Nombre Completo</FormLabel>
+                                        <FormControl><Input placeholder="John Doe" className="h-10 rounded-xl" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="document"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-700">Documento/Cédula</FormLabel>
+                                        <FormControl><Input placeholder="1020304050" className="h-10 rounded-xl" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-gray-700">Contraseña</FormLabel>
-                                <FormControl><Input type="password" placeholder="********" className="h-10 rounded-xl" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="confirmPassword"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-gray-700">Confirmar Contraseña</FormLabel>
-                                <FormControl><Input type="password" placeholder="********" className="h-10 rounded-xl" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-700">Correo Electrónico</FormLabel>
+                                        <FormControl><Input type="email" placeholder="user@example.com" className="h-10 rounded-xl" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="phone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-700">Teléfono</FormLabel>
+                                        <FormControl><Input placeholder="3001234567" className="h-10 rounded-xl" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-                <Button
-                    type="submit"
-                    disabled={isLoading || !!successMessage}
-                    className="w-full h-12 rounded-xl text-base font-semibold transition-all duration-200 mt-6 bg-indigo-600 hover:bg-indigo-700"
-                >
-                    {isLoading ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Registrando...</>
-                    ) : (
-                        'Crear Cuenta'
-                    )}
-                </Button>
-            </form>
-        </Form>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-700">Contraseña</FormLabel>
+                                        <FormControl><Input type="password" placeholder="********" className="h-10 rounded-xl" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-gray-700">Confirmar Contraseña</FormLabel>
+                                        <FormControl><Input type="password" placeholder="********" className="h-10 rounded-xl" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <Button
+                            type="submit"
+                            disabled={isLoading || !!successMessage}
+                            className="w-full h-12 rounded-xl text-base font-semibold transition-all duration-200 mt-6 bg-indigo-600 hover:bg-indigo-700"
+                        >
+                            {isLoading ? (
+                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Registrando...</>
+                            ) : (
+                                'Crear Cuenta'
+                            )}
+                        </Button>
+                    </form>
+                </Form>
+
+                <p className="text-center text-sm text-gray-500 pt-6 border-t mt-6 border-gray-100">
+                    ¿Ya tienes cuenta? <a href="/login" className="text-indigo-600 hover:text-indigo-500 font-semibold transition duration-150">Inicia sesión aquí</a>
+                </p>
+            </div>
+        </div>
     );
 }

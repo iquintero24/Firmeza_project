@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";   // ⭐ NECESARIO
 import api from "../api/axiosInstance";
 import { AppLayout } from "@/layouts/AppLayout";
 
@@ -12,6 +13,8 @@ interface Sale {
 }
 
 export default function SalesHistoryPage() {
+
+    const navigate = useNavigate();   // ⭐ AQUÍ ESTABA EL ERROR
 
     const [sales, setSales] = useState<Sale[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,8 +67,7 @@ export default function SalesHistoryPage() {
                                         </p>
 
                                         <p className="font-medium mt-1">
-                                            Total: $
-                                            {sale.total.toLocaleString("es-CO")}
+                                            Total: ${sale.total.toLocaleString("es-CO")}
                                         </p>
                                     </div>
 

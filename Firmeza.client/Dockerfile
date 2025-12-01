@@ -1,25 +1,16 @@
-# ============================
-# 1) BUILD DEL FRONTEND (VITE)
-# ============================
-FROM node:18 AS builder
-
+# 1) Build React
+FROM node:20 AS build
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
-
 RUN npm run build
 
-
-# ============================
-# 2) SERVIR CON NGINX
-# ============================
-FROM nginx:alpine
-
-COPY --from=builder /app/dist /usr/share/nginx/html
-
+# 2) Deploy con Nginx
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
